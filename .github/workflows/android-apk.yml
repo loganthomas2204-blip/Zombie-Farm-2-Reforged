@@ -43,7 +43,7 @@ jobs:
         run: npm ci
 
       - name: Install Capacitor
-        run: npm install --no-save --package-lock=false @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7
+        run: npm install --no-save --package-lock=false --legacy-peer-deps @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7
 
       - name: Configure Android app
         run: |
