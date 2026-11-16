@@ -1,0 +1,79 @@
+
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/android-apk.yml'
+      - 'src/**'
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.ts'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Compile Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Install game dependencies
+        run: npm ci
+
+      - name: Install Capacitor
+        run: npm install --no-save --package-lock=false @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7
+
+      - name: Configure Android app
+        run: |
+          cat > capacitor.config.json <<'EOF'
+          {
+            "appId": "com.loganthomas.zombiefarm",
+            "appName": "Zombie Farm Reforged",
+            "webDir": "dist"
+          }
+          EOF
+
+      - name: Build game
+        run: npm run build
+
+      - name: Generate Android project
+        run: npx cap add android
+
+      - name: Copy game into Android project
+        run: npx cap sync android
+
+      - name: Compile APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Zombie-Farm-Reforged-Android
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
