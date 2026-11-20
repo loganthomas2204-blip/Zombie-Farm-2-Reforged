@@ -3,7 +3,7 @@
   "productName": "Zombie Farm Reforged",
   "mainBinaryName": "ZombieFarm",
   "version": "0.2.3",
-  "identifier": "com.zombiefarmreforged.desktop",
+  "identifier": "com.loganthomas.zombiefarm.desktop",
   "build": {
     "frontendDist": "../placeholder"
   },
